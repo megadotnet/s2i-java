@@ -62,7 +62,7 @@
             "name": "centos"
          },
          "spec": {
-            "dockerImageRepository": "library/centos:centos7"
+            "dockerImageRepository": "docker.io/library/centos"
          }
       },
       {
@@ -268,7 +268,17 @@
                                  {
                                     "containerPort": 8080,
                                     "protocol": "TCP"
+                                 },
+                                 {
+                                    "containerPort": 7575,
+                                    "name": "grpc"
                                  }
+                              ],
+                              "volumeMounts": [
+                                  {
+                                      "name": "tz-config",
+                                      "mountPath": "/etc/localtime"
+                                  }
                               ],
                               "livenessProbe": {
                                  "tcpSocket": {
@@ -285,6 +295,14 @@
                                  "privileged": false
                               }
                            }
+                        ],
+                        "volumes": [
+                            {
+                                "name": "tz-config",
+                                "hostPath": {
+                                    "path": "/usr/share/zoneinfo/Asia/Shanghai"
+                                }
+                            }
                         ],
                         "restartPolicy": "Always",
                         "dnsPolicy": "ClusterFirst"
@@ -318,7 +336,12 @@
                         "name": "${APPLICATION_NAME}-http",
                         "port": 8080,
                         "targetPort": 8080
-                     }
+                     },
+                     {
+                        "name": "${APPLICATION_NAME}-grpc",
+                        "port": 7575,
+                        "targetPort": 7575
+                    }
                   ],
                   "selector": {
                      "deploymentconfig": "${APPLICATION_NAME}"
@@ -506,7 +529,17 @@
                                  {
                                     "containerPort": 8080,
                                     "protocol": "TCP"
+                                 },
+                                 {
+                                    "containerPort": 7575,
+                                    "name": "grpc"
                                  }
+                              ],
+                              "volumeMounts": [
+                                  {
+                                      "name": "tz-config",
+                                      "mountPath": "/etc/localtime"
+                                  }
                               ],
                               "livenessProbe": {
                                  "tcpSocket": {
@@ -523,6 +556,14 @@
                                  "privileged": false
                               }
                            }
+                        ],
+                        "volumes": [
+                            {
+                                "name": "tz-config",
+                                "hostPath": {
+                                    "path": "/usr/share/zoneinfo/Asia/Shanghai"
+                                }
+                            }
                         ],
                         "restartPolicy": "Always",
                         "dnsPolicy": "ClusterFirst"
@@ -556,7 +597,12 @@
                         "name": "${APPLICATION_NAME}-http",
                         "port": 8080,
                         "targetPort": 8080
-                     }
+                     },
+                     {
+                        "name": "${APPLICATION_NAME}-grpc",
+                        "port": 7575,
+                        "targetPort": 7575
+                    }
                   ],
                   "selector": {
                      "deploymentconfig": "${APPLICATION_NAME}"

@@ -1,0 +1,76 @@
+#!groovy
+
+node('maven') {
+    // define commands
+    echo "start pipeline for app: ${env.JOB_NAME}"
+    
+    configFileProvider(
+            [configFile(fileId: 'maven-settings-prod', variable: 'MAVEN_SETTINGS')]) {
+
+        // initialization
+        def mvnCmd = "mvn -s $MAVEN_SETTINGS"
+        def tokens = "${env.JOB_NAME}".tokenize('/')
+        def project = tokens[0]
+        def app = tokens[1]
+        def projectDev = "${project}-dev"
+        def projectStage = "${project}-stage"
+        echo "project: ${project}, app: ${app}"
+        echo "mvn: ${mvnCmd}"
+
+        stage ('Build') {
+            pullFromGit("master", "gitlab-jenkins-ci", "http://dev.vpclub.cn:8022")
+            buildWithMaven(mvnCmd)
+        }
+        
+        def ver = version()
+        stage ('Deploy DEV') {
+            deploy(projectDev, app, ver)
+        }
+    }
+}
+
+def pullFromGit(branch, credentialsId, url) {
+    git branch: "${branch}", credentialsId: "${credentialsId}", url: "${url}/${env.JOB_NAME}.git"
+}
+
+def buildWithMaven(mvnCmd) {
+    sh "${mvnCmd} clean install -Dmaven.test.skip=true"
+}
+
+def deploy(project, app, ver) {
+    sh "rm -rf oc-build && mkdir -p oc-build"
+    sh "cp target/${app}-${ver}.jar oc-build/app.jar"
+    sh "oc project ${project}"
+    // create build. override the exit code since it complains about exising imagestream
+    if ( !isExist("bc", app, project) ) {
+        sh "oc new-build --name=${app} --image-stream=s2i-java --binary=true --labels=app=${app} -n ${project} || true"
+    }
+    // build image
+    sh "oc start-build ${app} --from-dir=oc-build --wait=true -n ${project}"
+    // deploy image
+    if ( !isExist("dc", app, project) ) {
+        sh "oc new-app ${app}:latest -n ${project}"
+    }
+    if ( !isExist("route", app, project) ) {
+        sh "oc expose svc/${app} -n ${project}"
+    }    
+}
+
+def version() {
+    def matcher = readFile('pom.xml') =~ '<version>(.+)</version>'
+    matcher ? matcher[0][1] : null
+}
+
+def execShell(script) {
+    echo "script: ${script}"
+    
+    def result = sh(returnStdout: true, script: "${script}").trim()
+    echo "result: ${result}"
+    return result
+}
+
+def isExist(resource, app, project) {
+    def result = execShell("oc get ${resource} -n ${project} | grep ${app} | wc -l")
+    echo "result: ${result}"
+    return result != "0" ? true : false
+}
