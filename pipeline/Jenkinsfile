@@ -39,14 +39,14 @@ node('maven') {
         
         def ver = version()
         stage ('Deploy to Dev') {
-            deploy(project, app, ver, "dev")
+            deploy(project, app, ver, "dev", "Asia/Shanghai")
         }
 
         stage ('Deploy to Stage') {
             timeout(time:60, unit:'MINUTES') {
                 input message: "Promote to STAGE?", ok: "Promote"
             }
-            deploy(project, app, ver, "stage")
+            deploy(project, app, ver, "stage", "Asia/Shanghai")
         }
     }
 }
@@ -71,7 +71,7 @@ def analysis(mvnCmd, url) {
     sh "${mvnCmd} jacoco:report sonar:sonar -Dsonar.host.url=${url} -Dmaven.test.skip=true"
 }
 
-def deploy(project, app, ver, domain) {
+def deploy(project, app, ver, domain, timezone) {
     def projectDomain = "${project}-${domain}"
     def imageTag = "latest"
     if ( "dev" == domain ) {
@@ -93,10 +93,10 @@ def deploy(project, app, ver, domain) {
 
     // deploy image
     if ( !isExist("dc", app, projectDomain) ) {
-        sh "oc new-app ${app}:${imageTag} -n ${projectDomain}"
+        sh "oc new-app ${app}:${imageTag} --env TZ=${timezone} -n ${projectDomain}"
     }
     if ( !isExist("route", app, projectDomain) ) {
-        sh "oc expose svc/${app} -n ${projectDomain}"
+        sh "oc expose svc/${app} --port=8080 -n ${projectDomain}"
     }
 }
 
