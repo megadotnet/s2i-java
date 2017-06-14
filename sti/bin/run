@@ -7,4 +7,8 @@
 #	https://github.com/openshift/source-to-image/blob/master/docs/builder_image.md
 #
 
-exec java ${APP_OPTIONS} -Djava.security.egd=file:/dev/./urandom -jar /opt/openshift/app.jar 
+cd /opt/openshift && \
+exec java \
+    ${APP_OPTIONS} \
+    -Djava.security.egd=file:/dev/./urandom \
+    -jar /opt/openshift/app.jar
