@@ -34,7 +34,7 @@ ENV BUILDER_VERSION 1.0
 
 LABEL io.k8s.description="Platform for building Java (fatjar) applications with maven or gradle" \
       io.k8s.display-name="Java S2I builder 1.0" \
-      io.openshift.expose-services="7575:http,8080:http" \
+      io.openshift.expose-services="7575:http,8080:http,8888:http" \
       io.openshift.tags="builder,maven-3,gradle-2.6,java,microservices,fatjar"
 
 # TODO (optional): Copy the builder files into /opt/openshift
@@ -51,7 +51,10 @@ RUN chown -R 1001:1001 /opt/openshift
 USER 1001
 
 # Set the default port for applications built using this image
-EXPOSE 8080 
+EXPOSE 8080
+
+# KUBE_PING v0.9.x requires exposing ping port
+EXPOSE 8888
 
 # Set the default grpc server port
 EXPOSE 7575
