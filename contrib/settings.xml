@@ -16,7 +16,7 @@
             <!--This sends everything else to /public -->
             <id>nexus</id>
             <mirrorOf>*</mirrorOf>
-            <url>http://nexus.vpclub.cn/repository/maven-public/</url>
+            <url>${env.MAVEN_MIRROR_URL}</url>
         </mirror>
     </mirrors>
     <profiles>
@@ -24,8 +24,8 @@
             <id>nexus</id>
             <!--repository.url will be used in each project for simplicity-->
             <properties>
-                <nexus.releases>http://nexus.vpclub.cn/repository/maven-releases/</nexus.releases>
-                <nexus.snapshots>http://nexus.vpclub.cn/repository/maven-snapshots/</nexus.snapshots>
+                <nexus.releases>${env.MAVEN_REPO_RELEASE}</nexus.releases>
+                <nexus.snapshots>${env.MAVEN_REPO_SNAPSHOT}</nexus.snapshots>
             </properties>
             <!--Enable snapshots for the built in central repo to direct -->
             <!--all requests to nexus via the mirror -->

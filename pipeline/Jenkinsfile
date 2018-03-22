@@ -5,7 +5,7 @@ node('maven') {
     echo "start pipeline for app: ${env.JOB_NAME}"
     
     configFileProvider(
-            [configFile(fileId: 'maven-settings-prod', variable: 'MAVEN_SETTINGS')]) {
+            [configFile(fileId: 'maven-settings', variable: 'MAVEN_SETTINGS')]) {
 
         // initialization
         def mvnCmd = "mvn -s $MAVEN_SETTINGS"
@@ -18,7 +18,7 @@ node('maven') {
         echo "mvn: ${mvnCmd}"
 
         stage ('Build') {
-            pullFromGit("master", "gitlab-jenkins-ci", "http://172.16.5.22:8022")
+            pullFromGit("master", "gitlab-jenkins-ci", "http://gitlab.your.com")
             buildWithMaven(mvnCmd)
         }
 
