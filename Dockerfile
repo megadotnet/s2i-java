@@ -14,15 +14,15 @@ RUN INSTALL_PKGS="tar unzip bc which lsof java-1.8.0-openjdk java-1.8.0-openjdk-
     mkdir -p /opt/s2i/destination && chmod -R a+rwX /opt/s2i/destination && \
     mkdir -p /opt/app-root/src && chmod -R a+rwX /opt/app-root/src
 
-ENV MAVEN_VERSION 3.3.9
-RUN (curl -0 https://mirrors.ustc.edu.cn/macports/distfiles/maven3/apache-maven-$MAVEN_VERSION-bin.tar.gz | \
+ENV MAVEN_VERSION 3.5.2
+RUN (curl -0 https://stage.vpclub.cn/file/java/maven/apache-maven-${MAVEN_VERSION}-bin.tar.gz | \
     tar -zx -C /usr/local) && \
     mv /usr/local/apache-maven-$MAVEN_VERSION /usr/local/maven && \
     ln -sf /usr/local/maven/bin/mvn /usr/local/bin/mvn && \
     mkdir -p $HOME/.m2 && chmod -R a+rwX $HOME/.m2
 
-ENV GRADLE_VERSION 2.6
-RUN curl -sL -0 https://mirrors.ustc.edu.cn/macports/distfiles/gradle/gradle-${GRADLE_VERSION}-bin.zip -o /tmp/gradle-${GRADLE_VERSION}-bin.zip && \
+ENV GRADLE_VERSION 4.4.1
+RUN curl -sL -0 https://stage.vpclub.cn/file/java/gradle/gradle-${GRADLE_VERSION}-bin.zip -o /tmp/gradle-${GRADLE_VERSION}-bin.zip && \
     unzip /tmp/gradle-${GRADLE_VERSION}-bin.zip -d /usr/local/ && \
     rm /tmp/gradle-${GRADLE_VERSION}-bin.zip && \
     mv /usr/local/gradle-${GRADLE_VERSION} /usr/local/gradle && \
@@ -34,8 +34,8 @@ ENV BUILDER_VERSION 1.0
 
 LABEL io.k8s.description="Platform for building Java (fatjar) applications with maven or gradle" \
       io.k8s.display-name="Java S2I builder 1.0" \
-      io.openshift.expose-services="7575:http,8080:http,8888:http" \
-      io.openshift.tags="builder,maven-3,gradle-2.6,java,microservices,fatjar"
+      io.openshift.expose-services="7575:http,8080:http,8888:http,8778:http,9779:http" \
+      io.openshift.tags="builder,maven-3,gradle-4,java,microservices,fatjar"
 
 # TODO (optional): Copy the builder files into /opt/openshift
 # COPY ./<builder_folder>/ /opt/openshift/
@@ -51,13 +51,9 @@ RUN chown -R 1001:1001 /opt/openshift
 USER 1001
 
 # Set the default port for applications built using this image
-EXPOSE 8080
-
 # KUBE_PING v0.9.x requires exposing ping port
-EXPOSE 8888
-
 # Set the default grpc server port
-EXPOSE 7575
+EXPOSE 8080 8888 7575 8778 9779
 
 # Set the default CMD for the image
 # CMD ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/opt/openshift/app.jar"]
