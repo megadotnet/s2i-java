@@ -56,7 +56,13 @@ if [ -f "$LOCAL_SOURCE_DIR/pom.xml" ]; then
   echo "Using $(mvn --version)"
 
   # Execute the actual build
-  mvn $MAVEN_ARGS
+  if [ "${BUILD_CMD}" == "" ]; then
+    echo "build ..."
+    mvn $MAVEN_ARGS
+  else
+    echo "${BUILD_CMD}"
+    ${BUILD_CMD}
+  fi
 
   ERR=$?
   if [ $ERR -ne 0 ]; then
