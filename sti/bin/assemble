@@ -1,6 +1,7 @@
 #!/bin/bash
 . $(dirname $0)/functions
 
+echo "[S2I] Working dir: $PWD"
 HOME=/opt/app-root/src
 
 # we will move any code provided by s2i to here
@@ -57,10 +58,10 @@ if [ -f "$LOCAL_SOURCE_DIR/pom.xml" ]; then
 
   # Execute the actual build
   if [ "${BUILD_CMD}" == "" ]; then
-    echo "build ..."
+    echo "[S2I] build ..."
     mvn $MAVEN_ARGS
   else
-    echo "${BUILD_CMD}"
+    echo "[S2I] custom build: ${BUILD_CMD}"
     ${BUILD_CMD}
   fi
 
@@ -84,7 +85,7 @@ elif [ -f "$LOCAL_SOURCE_DIR/build.gradle" ]; then
   # artifacts (*.war, *.jar)
   ARTIFACT_DIR=${ARTIFACT_DIR:-build/libs}
 
-  echo "Building with gradle. $LOCAL_SOURCE_DIR/build.gradle found."
+  echo "[S2I] Building with gradle. $LOCAL_SOURCE_DIR/build.gradle found."
 
   # Use Gradle wrapper if available
   if [ -f "$LOCAL_SOURCE_DIR/gradlew" ]; then
@@ -100,9 +101,9 @@ elif [ -f "$LOCAL_SOURCE_DIR/build.gradle" ]; then
     # TODO: Specify setting file with -c sss
   fi
 
-  echo "Found gradle.build ... attempting to build with '$GRADLE_CMD -s ${BUILDER_ARGS}'"
+  echo "[S2I] Found gradle.build ... attempting to build with '$GRADLE_CMD -s ${BUILDER_ARGS}'"
 
-  echo "Gradle version:"
+  echo "[S2I] Gradle version:"
   $GRADLE_CMD --version
 
   # Execute the actual build
@@ -110,7 +111,7 @@ elif [ -f "$LOCAL_SOURCE_DIR/build.gradle" ]; then
 
   ERR=$?
   if [ $ERR -ne 0 ]; then
-    echo "Aborting due to error code $ERR from Gradle build"
+    echo "[S2I] Aborting due to error code $ERR from Gradle build"
     exit $ERR
   fi
 
