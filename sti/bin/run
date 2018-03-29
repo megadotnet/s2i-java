@@ -11,4 +11,6 @@ cd /opt/openshift && \
 exec java \
     ${APP_OPTIONS} \
     -Djava.security.egd=file:/dev/./urandom \
+    -Dfile.encoding=utf-8 \
+    -Djava.net.preferIPv4Stack=true \
     -jar /opt/openshift/app.jar
