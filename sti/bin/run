@@ -13,4 +13,5 @@ exec java \
     -Djava.security.egd=file:/dev/./urandom \
     -Dfile.encoding=utf-8 \
     -Djava.net.preferIPv4Stack=true \
+    -XX:+ExitOnOutOfMemoryError \
     -jar /opt/openshift/app.jar
