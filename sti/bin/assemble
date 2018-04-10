@@ -61,12 +61,22 @@ if [ -f "$LOCAL_SOURCE_DIR/pom.xml" ]; then
   echo "Using $(mvn --version)"
 
   # Execute the actual build
-  if [ "${PIPELINE_SCRIPT}" == "" ]; then
+  if [ "${BUILD_SCRIPT}" == "" ]; then
     echo "[INFO] build ..."
     mvn $MAVEN_ARGS
   else
-    echo "[INFO] custom script: ${PIPELINE_SCRIPT}"
-    eval "${PIPELINE_SCRIPT}"
+    echo "[INFO] build script: ${BUILD_SCRIPT}"
+    eval "${BUILD_SCRIPT}"
+  fi
+
+  if [ "${ANALYSIS_SCRIPT}" != "" ]; then
+    echo "[INFO] analysis script: ${ANALYSIS_SCRIPT}"
+    eval "${ANALYSIS_SCRIPT}"
+  fi
+
+  if [ "${TEST_SCRIPT}" != "" ]; then
+    echo "[INFO] test script: ${TEST_SCRIPT}"
+    eval "${TEST_SCRIPT}"
   fi
 
   ERR=$?
