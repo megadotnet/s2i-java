@@ -21,8 +21,7 @@ ENV MAVEN_VERSION=3.5.2 \
 # add a simple script that can auto-detect the appropriate JAVA_HOME value
 # based on whether the JDK or only the JRE is installed
 
-RUN set -ex && \
-    [[ ${JAVA_VERSION_MAJOR} != 7 ]] || ( echo >&2 'Oracle no longer publishes JAVA7 packages' && exit 1 ) && \
+RUN [[ ${JAVA_VERSION_MAJOR} != 7 ]] || ( echo >&2 'Oracle no longer publishes JAVA7 packages' && exit 1 ) && \
     apk add libstdc++ curl ca-certificates bash && \
     for pkg in glibc-${GLIBC_VERSION} glibc-bin-${GLIBC_VERSION} glibc-i18n-${GLIBC_VERSION}; do curl -sSL ${GLIBC_REPO}/releases/download/${GLIBC_VERSION}/${pkg}.apk -o /tmp/${pkg}.apk; done && \
     apk add --allow-untrusted /tmp/*.apk && \
@@ -95,8 +94,8 @@ RUN mkdir -p /opt/openshift && \
     mkdir -p /opt/s2i/destination && chmod -R a+rwX /opt/s2i/destination && \
     mkdir -p /opt/app-root/src && chmod -R a+rwX /opt/app-root/src
 
-RUN (curl -0 https://stage.vpclub.cn/file/java/maven/apache-maven-${MAVEN_VERSION}-bin.tar.gz | \
-    tar -zx -C /usr/local) && \
+RUN curl -0 https://stage.vpclub.cn/file/java/maven/apache-maven-${MAVEN_VERSION}-bin.tar.gz | \
+    tar -zx -C /usr/local && \
     mv /usr/local/apache-maven-$MAVEN_VERSION /usr/local/maven && \
     ln -sf /usr/local/maven/bin/mvn /usr/local/bin/mvn && \
     mkdir -p $HOME/.m2 && chmod -R a+rwX $HOME/.m2
