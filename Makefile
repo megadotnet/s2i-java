@@ -1,5 +1,6 @@
 
-IMAGE_NAME = openshift/s2i-java
+NAMESPACE := hidevopsio
+IMAGE_NAME := $(NAMESPACE)/s2i-java
 
 build:
 	docker build -t $(IMAGE_NAME) .
