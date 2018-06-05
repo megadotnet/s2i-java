@@ -17,7 +17,11 @@ ENV MAVEN_VERSION=3.5.2 \
     PATH=${PATH}:/opt/jdk/bin \
     GLIBC_REPO=https://github.com/sgerrand/alpine-pkg-glibc \
     GLIBC_VERSION=2.27-r0 \
-    LANG=C.UTF-8
+    LANG=C.UTF-8 \
+    M2_HOME=/usr/local/maven \
+    GRADLE_HOME=/usr/local/gradle
+
+ENV PATH=${M2_HOME}/bin:${JAVA_HOME}/bin:${GRADLE_HOME}/bin:${PATH}    
 # add a simple script that can auto-detect the appropriate JAVA_HOME value
 # based on whether the JDK or only the JRE is installed
 
@@ -87,20 +91,17 @@ RUN [[ ${JAVA_VERSION_MAJOR} != 7 ]] || ( echo >&2 'Oracle no longer publishes J
            /opt/jdk/jre/lib/oblique-fonts \
            /opt/jdk/jre/lib/plugin.jar \
            /tmp/* /var/cache/apk/* && \
-    echo 'hosts: files mdns4_minimal [NOTFOUND=return] dns mdns4' >> /etc/nsswitch.conf
-
-RUN mkdir -p /opt/openshift && \
+    echo 'hosts: files mdns4_minimal [NOTFOUND=return] dns mdns4' >> /etc/nsswitch.conf \
+    mkdir -p /opt/openshift && \
     mkdir -p /opt/app-root/source && chmod -R a+rwX /opt/app-root/source && \
     mkdir -p /opt/s2i/destination && chmod -R a+rwX /opt/s2i/destination && \
-    mkdir -p /opt/app-root/src && chmod -R a+rwX /opt/app-root/src
-
-RUN curl -0 https://stage.vpclub.cn/file/java/maven/apache-maven-${MAVEN_VERSION}-bin.tar.gz | \
+    mkdir -p /opt/app-root/src && chmod -R a+rwX /opt/app-root/src && \
+    curl -sL -0 https://stage.vpclub.cn/file/java/maven/apache-maven-${MAVEN_VERSION}-bin.tar.gz | \
     tar -zx -C /usr/local && \
     mv /usr/local/apache-maven-$MAVEN_VERSION /usr/local/maven && \
     ln -sf /usr/local/maven/bin/mvn /usr/local/bin/mvn && \
-    mkdir -p $HOME/.m2 && chmod -R a+rwX $HOME/.m2
-
-RUN curl -sL -0 https://stage.vpclub.cn/file/java/gradle/gradle-${GRADLE_VERSION}-bin.zip -o    /tmp/gradle-${GRADLE_VERSION}-bin.zip && \
+    mkdir -p $HOME/.m2 && chmod -R a+rwX $HOME/.m2 && \
+    curl -sL -0 https://stage.vpclub.cn/file/java/gradle/gradle-${GRADLE_VERSION}-bin.zip -o    /tmp/gradle-${GRADLE_VERSION}-bin.zip && \
     unzip /tmp/gradle-${GRADLE_VERSION}-bin.zip -d /usr/local/ && \
     rm /tmp/gradle-${GRADLE_VERSION}-bin.zip && \
     mv /usr/local/gradle-${GRADLE_VERSION} /usr/local/gradle && \
