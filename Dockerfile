@@ -1,6 +1,6 @@
 # s2i-java
 FROM openshift/base-centos7
-MAINTAINER John Deng <john.deng@outlook.com>
+MAINTAINER Peter Liu <kmdxdk1@hotmail.com>
 # HOME in base image is /opt/app-root/src
 
 # Install build tools on top of base image
@@ -15,14 +15,14 @@ RUN INSTALL_PKGS="tar unzip bc which lsof java-1.8.0-openjdk java-1.8.0-openjdk-
     mkdir -p /opt/app-root/src && chmod -R a+rwX /opt/app-root/src
 
 ENV MAVEN_VERSION 3.3.9
-RUN (curl -0 https://mirrors.ustc.edu.cn/macports/distfiles/maven3/apache-maven-$MAVEN_VERSION-bin.tar.gz | \
+RUN (curl -0 http://www.eu.apache.org/dist/maven/maven-3/$MAVEN_VERSION/binaries/apache-maven-$MAVEN_VERSION-bin.tar.gz | \
     tar -zx -C /usr/local) && \
     mv /usr/local/apache-maven-$MAVEN_VERSION /usr/local/maven && \
     ln -sf /usr/local/maven/bin/mvn /usr/local/bin/mvn && \
     mkdir -p $HOME/.m2 && chmod -R a+rwX $HOME/.m2
 
 ENV GRADLE_VERSION 2.6
-RUN curl -sL -0 https://mirrors.ustc.edu.cn/macports/distfiles/gradle/gradle-${GRADLE_VERSION}-bin.zip -o /tmp/gradle-${GRADLE_VERSION}-bin.zip && \
+RUN curl -sL -0 https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip -o /tmp/gradle-${GRADLE_VERSION}-bin.zip && \
     unzip /tmp/gradle-${GRADLE_VERSION}-bin.zip -d /usr/local/ && \
     rm /tmp/gradle-${GRADLE_VERSION}-bin.zip && \
     mv /usr/local/gradle-${GRADLE_VERSION} /usr/local/gradle && \
